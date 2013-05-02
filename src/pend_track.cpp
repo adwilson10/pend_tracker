@@ -163,6 +163,7 @@ public:
 		pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
 
 	    	ROS_DEBUG("Segmenting cloud");
+<<<<<<< HEAD
 		// Create the segmentation object
 		pcl::SACSegmentation<pcl::PointXYZ> seg;
 		// Optional
@@ -267,6 +268,112 @@ public:
 		std_msgs::Float32 ang2_msg;
 		ang2_msg.data = ang2;
 		config_pub[2].publish(ang2_msg);
+=======
+            // Create the segmentation object
+            pcl::SACSegmentation<pcl::PointXYZ> seg;
+            // Optional
+            seg.setOptimizeCoefficients (true);
+
+            seg.setModelType (pcl::SACMODEL_LINE);
+            seg.setMethodType (pcl::SAC_RANSAC);
+            seg.setDistanceThreshold (1.0);
+
+            seg.setInputCloud (cloud_cluster_1);
+            seg.segment (*inliers, *coefficients);
+
+            pcl::ProjectInliers<pcl::PointXYZ> proj;
+            proj.setModelType (pcl::SACMODEL_LINE);
+            proj.setIndices (inliers);
+            proj.setInputCloud (cloud_cluster_1);
+            proj.setModelCoefficients (coefficients);
+            proj.filter (*cloud_project_1);
+
+            double link1coeff[6] = {coefficients->values[0],coefficients->values[1],coefficients->values[2],coefficients->values[3],coefficients->values[4],coefficients->values[5]};
+
+            seg.setModelType (pcl::SACMODEL_LINE);
+            seg.setMethodType (pcl::SAC_RANSAC);
+            seg.setDistanceThreshold (1.0);
+
+            seg.setInputCloud (cloud_cluster_2);
+            seg.segment (*inliers, *coefficients);
+
+            proj.setModelType (pcl::SACMODEL_LINE);
+            proj.setIndices (inliers);
+            proj.setInputCloud (cloud_cluster_2);
+            proj.setModelCoefficients (coefficients);
+            proj.filter (*cloud_project_2);
+
+            double link2coeff[6] = {coefficients->values[0],coefficients->values[1],coefficients->values[2],coefficients->values[3],coefficients->values[4],coefficients->values[5]};
+
+	    	pcl::toROSMsg(*cloud_project_1, *ros_cloud);
+		    ros_cloud->header.frame_id = "/oriented_optimization_frame";
+	    	cloud_pub[2].publish(ros_cloud);
+
+	    	pcl::toROSMsg(*cloud_project_2, *ros_cloud);
+		    ros_cloud->header.frame_id = "/oriented_optimization_frame";
+	    	cloud_pub[3].publish(ros_cloud);
+
+
+		    // compute centroid for link placement:
+		    pcl::compute3DCentroid(*cloud_cluster_1, centroid1);              
+	    	pcl::compute3DCentroid(*cloud_cluster_2, centroid2);
+
+
+            double *linkcoeff[2] = {link1coeff,link2coeff};
+
+            int i,j;
+            if(centroid1(1)>centroid2(1)){
+                i = 0; j = 1;}
+            else{
+                i = 1; j = 0;}
+            
+            double x1 = linkcoeff[i][0];
+            double y1 = linkcoeff[i][1];
+            double x2 = linkcoeff[i][0]+linkcoeff[i][3];
+            double y2 = linkcoeff[i][1]+linkcoeff[i][4];
+            double x3 = linkcoeff[j][0];
+            double y3 = linkcoeff[j][1];
+            double x4 = linkcoeff[j][0]+linkcoeff[j][3];
+            double y4 = linkcoeff[j][1]+linkcoeff[j][4];
+
+            double xint2 = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+            double yint2 = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+
+            x3 = 1;
+            y3 = -0.105;
+            x4 = 0;
+            y4 = -0.105;
+
+            double xint1 = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+            double yint1 = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+
+            double ang1;
+	    double ang2;
+            float xpos;
+
+            if(i==0){
+		ang1 = atan2(yint1-centroid1(1),xint1-centroid1(0));
+		ang2 = atan2(centroid2(1)-yint2,centroid2(0)-xint1)-ang1;
+		xpos = xint1;
+            }
+            else{
+		ang1 = atan2(yint1-centroid2(1),xint1-centroid2(0));
+		ang2 = atan2(centroid1(1)-yint2,centroid1(0)-xint1)-ang1;
+		xpos = xint1;
+            }   
+
+            std_msgs::Float32 xpos_msg;
+            xpos_msg.data = xpos;
+            config_pub[0].publish(xpos_msg);
+
+            std_msgs::Float32 ang1_msg;
+            ang1_msg.data = ang1;
+            config_pub[1].publish(ang1_msg);
+
+            std_msgs::Float32 ang2_msg;
+            ang2_msg.data = ang2;
+            config_pub[2].publish(ang2_msg);
+>>>>>>> 311390996ee02f31f0732ccac6bd599bdfdc236f
 
  
 		//Define marker for intersection
