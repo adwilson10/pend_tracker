@@ -241,39 +241,20 @@ public:
             double xint1 = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
             double yint1 = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
 
-            double Ax = xint2 - xint1;
-            double Ay = yint2 - yint1;
-            double Bx = 1;
-            double By = 0;
-
-            double ang1 = acos((Ax*Bx+Ay*By)/(sqrt(Ax*Ax+Ay*Ay)));
-        
-            int ang2sign;
+            double ang1;
+	    double ang2;
             float xpos;
 
             if(i==0){
-                Bx = centroid2(0)-xint2;  By = centroid2(1)-yint2;
-                xpos = centroid1(0);
-                if(((xint2-xint1)*(centroid2(1)-yint1)-(yint2-yint1)*(centroid2(0)-xint1))>=0)
-                    ang2sign = 1;
-                else
-                    ang2sign = -1;
+		ang1 = atan2(yint1-centroid1(1),xint1-centroid1(0));
+		ang2 = atan2(centroid2(1)-yint2,centroid2(0)-xint1)-ang1;
+		xpos = xint1;
             }
             else{
-                Bx = centroid1(0)-xint2;  By = centroid1(1)-yint2;
-                xpos = centroid2(0);
-                if(((xint2-xint1)*(centroid1(1)-yint1)-(yint2-yint1)*(centroid1(0)-xint1))>=0)
-                    ang2sign = 1;
-                else
-                    ang2sign = -1;
+		ang1 = atan2(yint1-centroid2(1),xint1-centroid2(0));
+		ang2 = atan2(centroid1(1)-yint2,centroid1(0)-xint1)-ang1;
+		xpos = xint1;
             }   
-
-            double ang2 = ang2sign*acos((Ax*Bx+Ay*By)/(sqrt(Ax*Ax+Ay*Ay)*sqrt(Bx*Bx+By*By)));
-
-            if(ang2>3.0)
-                ang2 = ang2 - PI;
-            else if(ang2<-3.0)
-                ang2 = ang2 + PI;       
 
             std_msgs::Float32 xpos_msg;
             xpos_msg.data = xpos;
