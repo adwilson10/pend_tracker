@@ -46,7 +46,7 @@ args="0 0 0 -0.0018491 -0.187725 0.98222 -0.000353407 camera_depth_optical_frame
       <rosparam>
         filter_field_name: y
         filter_limit_min: -1.45
-        filter_limit_max: -0.15
+        filter_limit_max: 0.0
       </rosparam>
     </node>
   </group>
