@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include <std_msgs/Float32.h>
+#include <pend_tracker/PendConfig.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_datatypes.h>
@@ -32,7 +33,7 @@ private:
     ros::Subscriber cloud_sub;
     ros::Publisher cloud_pub[MAX_CLUSTERS];
     ros::Publisher marker_pub[2];
-    ros::Publisher config_pub[3];
+    ros::Publisher config_pub;
     tf::Transform tf;
 
 public:
@@ -77,9 +78,7 @@ public:
 	    marker_pub[0] = n_.advertise<visualization_msgs::Marker>("int1_marker", 1);
 	    marker_pub[1] = n_.advertise<visualization_msgs::Marker>("int2_marker", 1);
         
-	    config_pub[0] = n_.advertise<std_msgs::Float32>("xpos",1);
-	    config_pub[1] = n_.advertise<std_msgs::Float32>("ang1",1);
-	    config_pub[2] = n_.advertise<std_msgs::Float32>("ang2",1);
+	    config_pub = n_.advertise<pend_tracker::PendConfig>("configs",1);
 
 	    return;
 	}
@@ -90,6 +89,7 @@ public:
 	    ROS_DEBUG("Filtered cloud receieved");
 	    ros::Time start_time = ros::Time::now();
 	    ros::Time tcur = ros::Time::now();
+	    ros::Time tcloud = (*scan).header.stamp;
 
 	    sensor_msgs::PointCloud2::Ptr ros_cloud(new sensor_msgs::PointCloud2 ());
 	    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
@@ -101,9 +101,6 @@ public:
 	    Eigen::Vector4f centroid1;
 	    Eigen::Vector4f centroid2;
 	    Eigen::Vector4f robot_centroid;
-
-	    // set time stamp and frame id
-	    ros::Time tstamp = ros::Time::now();
 
 	    ROS_DEBUG("finished declaring vars : %f", (ros::Time::now()-tcur).toSec());
 	    tcur = ros::Time::now();
@@ -257,42 +254,40 @@ public:
     	ROS_DEBUG("Publishing extracted cloud");
     	pcl::toROSMsg(*cloud_cluster_1, *ros_cloud);
 		ros_cloud->header.frame_id = "/oriented_optimization_frame";
+		ros_cloud->header.stamp = tcloud;
     	cloud_pub[0].publish(ros_cloud);
 
     	pcl::toROSMsg(*cloud_cluster_2, *ros_cloud);
 		ros_cloud->header.frame_id = "/oriented_optimization_frame";
+		ros_cloud->header.stamp = tcloud;
     	cloud_pub[i+1].publish(ros_cloud);
 
     	pcl::toROSMsg(*cloud_cluster_3, *ros_cloud);
 		ros_cloud->header.frame_id = "/oriented_optimization_frame";
+		ros_cloud->header.stamp = tcloud;
     	cloud_pub[j+1].publish(ros_cloud);
 
 		pcl::toROSMsg(*cloud_project_1, *ros_cloud);
 		ros_cloud->header.frame_id = "/oriented_optimization_frame";
+		ros_cloud->header.stamp = tcloud;
 		cloud_pub[i+3].publish(ros_cloud);
 
 		pcl::toROSMsg(*cloud_project_2, *ros_cloud);
 		ros_cloud->header.frame_id = "/oriented_optimization_frame";
+		ros_cloud->header.stamp = tcloud;
 		cloud_pub[j+3].publish(ros_cloud);
 
-
-		std_msgs::Float32 xpos_msg;
-		xpos_msg.data = robot_centroid(0);
-		config_pub[0].publish(xpos_msg);
-
-		std_msgs::Float32 ang1_msg;
-		ang1_msg.data = ang1;
-		config_pub[1].publish(ang1_msg);
-
-		std_msgs::Float32 ang2_msg;
-		ang2_msg.data = ang2;
-		config_pub[2].publish(ang2_msg);
-
+        pend_tracker::PendConfig config_msg;
+        config_msg.header.stamp = tcloud;
+        config_msg.xpos = robot_centroid(0);
+        config_msg.ang1 = ang1;
+        config_msg.ang2 = ang2;
+        config_pub.publish(config_msg);
  
 		//Define marker for intersection
 		visualization_msgs::Marker marker1;
 		marker1.header.frame_id = "/oriented_optimization_frame";
-		marker1.header.stamp = ros::Time::now();
+		marker1.header.stamp = tcloud;
 		marker1.ns = "basic_shapes";
 		marker1.id = 0;
 		marker1.type = visualization_msgs::Marker::SPHERE;
@@ -312,7 +307,7 @@ public:
 
 		visualization_msgs::Marker marker2;
 		marker2.header.frame_id = "/oriented_optimization_frame";
-		marker2.header.stamp = ros::Time::now();
+		marker2.header.stamp = tcloud;
 		marker2.ns = "basic_shapes";
 		marker2.id = 0;
 		marker2.type = visualization_msgs::Marker::SPHERE;
