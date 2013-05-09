@@ -1,0 +1,40 @@
+<launch>
+  <!-- define all arguments -->
+  <arg name="file" default="default.txt" />
+  <arg name="dir" default="$(find pend_tracker)/data/" />
+  <arg name="index" value="1" />
+  <arg name="vis" default="true" />
+
+  <!-- set any parameters -->
+  <param name="/number_robots" type="int" value="1" />
+  <param name="robot_index" value="$(arg index)" />
+
+
+  <!-- start up robot, controller, serial, etc. -->
+  <arg name="rn" value="robot_1" />
+  <!-- start serial node -->
+  <node pkg="serial_node" type="multi_serial_topic" name="serial_node"
+    	output="log" respawn="true" />
+  <!-- start controller node -->
+  <node pkg="pend_tracker" type="pend_controller" name="controller"
+	output="screen" respawn="true" cwd="node"
+	args="-f $(arg file) -p $(arg dir)" />
+
+
+  <!-- start up the keyboard node -->
+  <node pkg="keyboard_node" type="multi_keyboard_node"
+	name="keyboard_interface" output="screen" respawn="true"
+	launch-prefix="xterm -rv -e" />
+
+  <!-- start up the kinect and all of the file tracking nodelets -->
+  <include file="$(find pend_tracker)/launch/pend_track.launch" />
+
+
+  <!-- start up rviz unless visualization is set to false -->
+  <group if="$(arg vis)">
+    <node pkg="rviz" type="rviz" respawn="false" name="rviz" />
+  </group>
+  
+  
+
+</launch>

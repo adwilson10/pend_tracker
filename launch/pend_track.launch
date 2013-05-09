@@ -7,10 +7,6 @@
   <!-- launch the nodelet manager -->
   <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen"/>  
 
-  <!-- tracker nodes and static frame broadcaster -->
-  <node pkg="pend_tracker" type="pend_track"
-  	name="pend_tracking_node" output="screen" /> -->
-
   <node pkg="tf" type="static_transform_publisher" name="optimization_frame_broadcaster" 
 args="0 0 0 -0.0018491 -0.187725 0.98222 -0.000353407 camera_depth_optical_frame oriented_optimization_frame 100" />
 
@@ -50,5 +46,9 @@ args="0 0 0 -0.0018491 -0.187725 0.98222 -0.000353407 camera_depth_optical_frame
       </rosparam>
     </node>
   </group>
+
+  <!-- tracker nodes and static frame broadcaster -->
+  <node pkg="pend_tracker" type="pend_track"
+  	name="pend_tracking_node" output="screen" respawn="true"/> 
 
 </launch>

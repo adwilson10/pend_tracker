@@ -72,14 +72,18 @@ include_directories(include
 
 ## Declare a cpp executable
 add_executable(pend_track src/pend_track.cpp)
+add_executable(pend_controller src/pend_controller.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(pend_tracker_node pend_tracker_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(pend_track
-   ${catkin_LIBRARIES} ${PCL_LIBRARIES}
+ target_link_libraries(
+    pend_track ${catkin_LIBRARIES} ${PCL_LIBRARIES}
+ )
+ target_link_libraries(
+    pend_controller ${catkin_LIBRARIES}
  )
 
 #############
