@@ -19,7 +19,7 @@ args="0 0 0 -0.0018491 -0.187725 0.98222 -0.000353407 camera_depth_optical_frame
         filter_limit_min: 0
         filter_limit_max: 2.5
         fiter_limit_negative: True
-        leaf_size: 0.01
+        leaf_size: 0.0075
         output_frame: /oriented_optimization_frame
       </rosparam>
     </node>

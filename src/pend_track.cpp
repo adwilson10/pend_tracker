@@ -123,8 +123,8 @@ public:
         // setup cluster extraction:
         pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
         ec.setClusterTolerance (0.018); // cm
-        ec.setMinClusterSize (50);
-        ec.setMaxClusterSize (600);
+        ec.setMinClusterSize (100);
+        ec.setMaxClusterSize (1000);
         ec.setInputCloud (cloud);
         // perform cluster extraction
         ec.extract (cluster_indices);
