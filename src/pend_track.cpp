@@ -53,28 +53,6 @@ public:
             (ss.str(), 1);
         }
 
-        tf::StampedTransform t;
-        tf::TransformListener listener;
-
-        ROS_DEBUG("Looking up transform from kinect to optimization frame");
-        try
-        {
-        ros::Time now=ros::Time::now();
-        listener.waitForTransform("/camera_depth_optical_frame",
-                      "/oriented_optimization_frame",
-                      now, ros::Duration(1.0));
-        listener.lookupTransform("/oriented_optimization_frame",
-                     "/camera_depth_optical_frame",
-                     ros::Time(0), t);
-        tf = t;     
-
-        }
-        catch (tf::TransformException ex)
-        {
-        ROS_ERROR("%s", ex.what());
-        ros::shutdown();
-        }
-
         marker_pub[0] = n_.advertise<visualization_msgs::Marker>("int1_marker", 1);
         marker_pub[1] = n_.advertise<visualization_msgs::Marker>("int2_marker", 1);
         
@@ -122,8 +100,8 @@ public:
 
         // setup cluster extraction:
         pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-        ec.setClusterTolerance (0.018); // cm
-        ec.setMinClusterSize (100);
+        ec.setClusterTolerance (0.015); // cm
+        ec.setMinClusterSize (50);
         ec.setMaxClusterSize (1000);
         ec.setInputCloud (cloud);
         // perform cluster extraction
@@ -222,9 +200,9 @@ public:
         double x2 = linkcoeff[i][0]+linkcoeff[i][3];
         double y2 = linkcoeff[i][1]+linkcoeff[i][4];
         double x3 = 1;
-        double y3 = min_point(1);
+        double y3 = 0.15; //min_point(1);
         double x4 = 0;
-        double y4 = min_point(1);
+        double y4 = 0.15; //min_point(1);
 
         double xint1 = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
         double yint1 = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
