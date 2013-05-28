@@ -100,7 +100,7 @@ public:
 
         // setup cluster extraction:
         pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-        ec.setClusterTolerance (0.015); // cm
+        ec.setClusterTolerance (0.013); // cm
         ec.setMinClusterSize (50);
         ec.setMaxClusterSize (1000);
         ec.setInputCloud (cloud);
@@ -221,11 +221,11 @@ public:
 
         if(i==0){
             ang1 = atan2(centroid1(1)-yint1, centroid1(0)-xint1);
-            ang2 = atan2(centroid2(1)-yint2, centroid2(0)-xint1)-ang1;
+            ang2 = atan2(centroid2(1)-yint2, centroid2(0)-xint2);//-ang1;
         }
         else{
             ang1 = atan2(centroid2(1)-yint1, centroid2(0)-xint1);
-            ang2 = atan2(centroid1(1)-yint2, centroid1(0)-xint1)-ang1;
+            ang2 = atan2(centroid1(1)-yint2, centroid1(0)-xint2);//-ang1;
         }   
 
         // convert to rosmsg and publish:
