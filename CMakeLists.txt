@@ -4,7 +4,7 @@ project(pend_tracker)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs tf tf_conversions message_generation)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs tf tf_conversions message_generation puppeteer_msgs)
 
 ## System dependencies are found with CMake's conventions
 find_package(PCL 1.3 REQUIRED)
@@ -73,6 +73,8 @@ include_directories(include
 ## Declare a cpp executable
 add_executable(pend_track src/pend_track.cpp)
 add_executable(pend_controller src/pend_controller.cpp)
+add_dependencies(pend_track pend_tracker_gencpp)
+add_dependencies(pend_controller pend_tracker_gencpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
