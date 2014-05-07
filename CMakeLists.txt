@@ -49,9 +49,9 @@ add_definitions(${PCL_DEFINITIONS})
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-   INCLUDE_DIRS include
+   # INCLUDE_DIRS include
 #  LIBRARIES pend_tracker
-   CATKIN_DEPENDS rospy roscpp std_msgs visualization_msgs tf tf_conversions
+   CATKIN_DEPENDS rospy roscpp std_msgs visualization_msgs tf tf_conversions message_runtime puppeteer_msgs
 #  DEPENDS system_lib
 )
 
